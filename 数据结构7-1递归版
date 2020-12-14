@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct datatable
+{
+    int data;
+    struct datatable *ptr;
+};
+
+void search(struct datatable *table,int *visited,int data,int nowfloor)    //search  用于找出所有与目标结点距离小于等于6的结点
+{
+    struct datatable *p;
+    if(nowfloor<6)
+    {
+        p=table[data].ptr;
+        while(p!=NULL)
+        {
+            visited[p->data]=1;
+            search(table,visited,p->data,nowfloor+1);
+            p=p->ptr;
+        }
+    }
+}
+
+int main()
+{
+    int n,m,i,mh,mt,visited[1001]={0},tablei,nowfloor=1,xydysix=0;
+    /*xydysix:小于等于six，用来计算与目标结点之间距离小于等于6的结点数的变量
+       visited[]数组 用于存储与目标结点距离小于等于6的结点信息  如目标结点是1 1与2的距离小于6  则 visited[2]=1，反之=0.
+
+    */
+    struct datatable table[1001],*p,*q;   //table[i]是一个邻接表，用来存放图
+    float f;
+    scanf("%d%d",&n,&m);
+    for(i=1;i<=n;i++)
+    {
+        table[i].data=n;
+        table[i].ptr=NULL;
+    }
+    for(i=1;i<=m;i++)     //for   将后面输入的每条边存到邻接表里面
+    {
+        scanf("%d%d",&mh,&mt);
+        p=table+mh;
+        while(p->ptr!=NULL)
+        {
+            p=p->ptr;
+        }
+        q=malloc(sizeof(struct datatable));
+        p->ptr=q;
+        p=p->ptr;
+        p->data=mt;
+        p->ptr=NULL;
+        p=table+mt;
+        while(p->ptr!=NULL)
+        {
+            p=p->ptr;
+        }
+        q=malloc(sizeof(struct datatable));
+        p->ptr=q;
+        p=p->ptr;
+        p->data=mh;
+        p->ptr=NULL;
+    }
+
+
+    for(tablei=1;tablei<=n;tablei++)
+        /*tablei 为目标结点的编号 这个for循环的循环体用于计算出与目标结点的距离小于六的结点数
+        */
+    {
+        visited[tablei]=1;
+        p=table[tablei].ptr;
+        while(p!=NULL)
+        {
+            visited[p->data]=1;
+            search(table,visited,p->data,nowfloor);    //search函数 是一个递归函数 在上面
+            p=p->ptr;
+        }
+        for(i=1;i<=n;i++)
+        {
+            if(visited[i]==1)xydysix++;
+        }
+        f=xydysix*100.0/n;
+        printf("%d: %.2f%%\n",tablei,f);
+        for(i=1;i<=n;i++)
+        {
+            visited[i]=0;
+        }
+        xydysix=0;
+    }
+    return 0;
+}
